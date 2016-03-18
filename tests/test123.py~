@@ -1,0 +1,16 @@
+import unittest
+import bencode
+abc = bencode.bdecode(open('kl.torrent', 'rb').read())
+str2 = "announce";
+#print abc
+print abc['comment']
+n=len(abc['info']['files']
+print n
+print abc['info']['files'][0]['path']
+#print abc['info']['files']['length']
+print abc['info']['name']
+print abc['info']['pieces']
+print abc['encoding']
+print abc['creation date']
+print abc['announce-list']
+print abc['announce']
