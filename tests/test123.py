@@ -1,3 +1,4 @@
 import unittest
 import bencode
-print bencode.bdecode(open('abc.torrent', 'rb').read())
+abc = bencode.bdecode(open('hello.txt.torrent', 'rb').read())
+print abc
