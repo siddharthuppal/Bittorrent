@@ -1,6 +1,9 @@
 from Tkinter import *
 from tkFileDialog import askopenfilename
 import sys
+import unittest
+import bencode
+
 def donothing():
    filewin = Toplevel(root)
    button = Button(filewin, text="Do nothing button")
@@ -12,9 +15,9 @@ def quit_handler():
 
 def open_file_handler():
     file= askopenfilename()
-    print file
-    return file 
-   
+    abc = bencode.bdecode(open(file, 'rb').read())
+    print abc
+    return file   
 
 root = Tk()
 menubar = Menu(root)
