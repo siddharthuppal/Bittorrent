@@ -7,9 +7,20 @@ import random
 import string
 import requests
 import urllib
+import urllib2
+
+
 
 local_port = 59696
 peer_id_start = '-KB1000-'
+
+
+proxy = urllib2.ProxyHandler({'ip':'10.175.96.118'})
+opener = urllib2.build_opener(proxy)
+urllib2.install_opener(opener)
+
+
+
 
 
 def length_of_file(metainfo):
@@ -32,24 +43,31 @@ def generate_peer_id():
 
 def get_parameters(metainfo):
 	info = metainfo['info'] 
-	print info
 	sha_info=hashlib.sha1(bencode.bencode(info))
 	info_hash = sha_info.digest()
-    peer_id=generate_peer_id()
-    uploaded=0
-    downloaded=0
-    left=length_of_file(metainfo)
-  #  compact=1
-    no_peer_id=0
-    event="started"
-    param_dict = {'info_hash':info_hash, 'peer_id':peer_id, 'port':local_port, 'uploaded':uploaded, 
-	    'downloaded':downloaded, 'left':left, 'compact':compact, 'no_peer_id':no_peer_id, 'event':event}
-    return param_dict
+	peer_id=generate_peer_id()
+	uploaded=0
+	downloaded=0
+	left=length_of_file(metainfo)
+	#  compact=1
+	no_peer_id=0
+	event="started"
+	param_dict = {'info_hash':info_hash, 'peer_id':peer_id, 'port':local_port, 'uploaded':uploaded,
+	'downloaded':downloaded, 'left':left,'no_peer_id':no_peer_id, 'event':event}
+	return param_dict
 
 def get_peers(metainfo):
 	announce_url = metainfo['announce']
  	parameter_list = get_parameters(metainfo)
- 	r = requests.get(announce_url, params=parameter_list)
+ 	c1=announce_url
+ 	c2=urllib.urlencode(parameter_list)
+ 	c3=c1+ "?"+c2
+ 	print c3
+ 	r=urllib2.urlopen(c3).read()
+ 	#r = requests.get(announce_url, params=parameter_list)
+ 	print r
+ 	print "the tk\n"
+ 	print r.url
  	#torrentObj = Torrent(metainfo)
  	#r = requests.get(torrentObj.announce_url, params=torrentObj.param_dict)
  	peers = parse_response_from_tracker(r)
@@ -81,35 +99,6 @@ def parse_response_from_tracker(r):
 	return peer_list
  
 
-
-abc = bencode.bdecode(open('try.torrent', 'rb').read())
-str2 = "announce";
-
-#print abc
-#print abc['comment']
-
-
-n=len(abc['info']['files']);
-n1=length_of_file(abc)
-
-print "length of file " + str(n1)
-
-id1=generate_peer_id()
-print id1
-
-#k=0
-#for i in range(n):
-#	print abc['info']['files'][i]['path']
-#	k=k+abc['info']['files'][i]['length']
-	
-#print k
-#print abc['info']['piece length']
-#print abc['info']['name']
-
-#print abc['info']['pieces']
-
-
-print abc['creation date']
-print abc['announce-list']
-print abc['announce']
-
+if __name__ == "__main__":
+	abc = bencode.bdecode(open('kl.torrent', 'rb').read())
+	get_peers(abc)
