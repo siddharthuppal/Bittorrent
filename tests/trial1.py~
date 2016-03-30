@@ -41,40 +41,31 @@ def get_parameters(metainfo):
 	uploaded=0
 	downloaded=0
 	left=length_of_file(metainfo)
-	compact=1
+	#  compact=1
 	no_peer_id=0
 	event="started"
 	param_dict = {'info_hash':info_hash, 'peer_id':peer_id, 'port':local_port, 'uploaded':uploaded,
-	'downloaded':downloaded, 'left':left,'compact':compact, 'no_peer_id':no_peer_id, 'event':event}
+	'downloaded':downloaded, 'left':left,'no_peer_id':no_peer_id, 'event':event}
 	return param_dict
 
 def get_peers(metainfo):
 	announce_url = metainfo['announce']
  	parameter_list = get_parameters(metainfo)
- #	c1=announce_url
-# 	c2=urllib.urlencode(parameter_list)
- #	c3=c1+ "?"+c2
- #	print c3
- #	r=urllib2.urlopen(c3).read()
- 	try:
- 		r = requests.get(announce_url, params=parameter_list,timeout=5)
-    	#page1 = requests.get(ap)
-	except requests.exceptions.ConnectionError:
-		r1.status_code = "Connection refused"
- 	#r = requests.get(announce_url, params=parameter_list,timeout=5)
- 	#print r
+ 	c1=announce_url
+ 	c2=urllib.urlencode(parameter_list)
+ 	c3=c1+ "?"+c2
+ 	print c3
+ 	r=urllib2.urlopen(c3).read()
+ 	#r = requests.get(announce_url, params=parameter_list)
+ 	print r
  	print "the tk\n"
- 	#print r.url
+ 	print r.url
  	#torrentObj = Torrent(metainfo)
  	#r = requests.get(torrentObj.announce_url, params=torrentObj.param_dict)
- 	print "before function "
  	peers = parse_response_from_tracker(r)
- 	print "after function "
- 	print peers
- 	return peers
+ 	return peers, torrentObj
 
 def parse_response_from_tracker(r):
-	print "in function"
 	response = bencode.bdecode(r.text)
 	print response
 	response = bencode.bdecode(r.content)
@@ -96,7 +87,6 @@ def parse_response_from_tracker(r):
 		else:
 			peer_address += str(ord(c))+'.'
 		i += 1
-	print "just before return"	
 	print str(peer_list)
 	return peer_list
  
