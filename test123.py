@@ -1,4 +1,4 @@
 import unittest
-import bencode
-abc = bencode.bdecode(open('hello.txt.torrent', 'rb').read())
+import urllib2
+abc = urllib2.urlopen("http://google.com").read()
 print abc
