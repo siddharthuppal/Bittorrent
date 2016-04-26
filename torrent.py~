@@ -76,7 +76,7 @@ class Torrent(object):
         end = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(N))
         peer_id = PEER_ID_START + end
         return peer_id
-   
+    '''
     def findHTTPserver(self):
         info = self.metainfo['info']
         if "announce-list" in info:
@@ -88,5 +88,5 @@ class Torrent(object):
         else:
             y=info['announce']
             return y
-    
+    '''
 

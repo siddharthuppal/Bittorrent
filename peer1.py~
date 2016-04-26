@@ -11,24 +11,51 @@ import sys
 import unittest
 import bencode
 
-def parse_response_from_tracker(r):
-    response = bencode.bdecode(r.text)
-    peers = response['peers']
-    x=len(peers)
-    length=0
-    peer_ip_and_port_dict={}
-    while length<x:
-        ip=''
-        port=0
-        for k in peers[length:4+length]:
-            ip=ip + str(ord(k)) + (".")
-            length=length+1
-        port=ord(peers[length])*256+ord(peers[length+1])
-        length=length+2
-        peer_ip_and_port_dict[ip[:-1]]=port  
-    print peer_ip_and_port_dict
-    return peer_ip_and_port_dict      
+def connect(handshake,peers,torrentObj):
+        number_connections = 0
+        k=len(peers)
 
+        for peer in peers:
+            if number_connections < k:
+                hostandport = peer.split(':')
+                print hostandport[0] + ':' + hostandport[1]
+                bittorrent_factory = BittorrentFactory(torrentObj)
+                reactor.connectTCP(hostandport[0], int(hostandport[1]),bittorrent_factory)
+                number_connections += 1
+
+def parse_response_from_tracker(r):
+    '''Input: http response from our request to the tracker
+       Output: a list of peer_ids
+       Takes the http response from the tracker and parses the peer ids from the 
+       response. This involves changing the peer string from unicode (binary model)
+       to a network(?) model(x.x.x.x:y). From the spec: 'First 4 bytes are the IP address and
+       last 2 bytes are the port number'
+    '''
+    response = bencode.bdecode(r.content)
+    print response
+    peers = response['peers']
+    #print peers
+    #print [str(ord(x))+x for x in peers]
+
+
+    i=1
+    peer_address = ''
+    peer_list = []
+    for c in peers:
+        if i%6 == 5:
+            port_large = ord(c)*256
+        elif i%6 == 0:
+            port_small = ord(c)
+            port = port_large+port_small
+            peer_address += ':'+str(port)
+            peer_list.append(peer_address)
+            peer_address = ''
+        elif i%6 == 4:
+            peer_address += str(ord(c))
+        else:
+            peer_address += str(ord(c))+'.'
+        i += 1
+    return peer_list
 
 def get_peers(metainfo):
     '''Input: metainfo file (.torrent file)
@@ -83,7 +110,11 @@ def main(torrentFile):
     k=len(peers)
     print k
     handske=handshake(peers, torrentObj)
-   
+    connect(handske,peers,torrentObj)
+
+    reactor.run()
+
+
 
 if __name__ == "__main__":
     
